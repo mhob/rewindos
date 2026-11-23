@@ -80,11 +80,16 @@ def process_ocr(image_path: str) -> dict:
 
             full_text_parts.append(text)
             word_count += len(text.split())
-            bounding_boxes.append({
-                "text_content": text,
-                "x": x, "y": y, "width": w, "height": h,
-                "confidence": round(float(score), 4),
-            })
+            bounding_boxes.append(
+                {
+                    "text_content": text,
+                    "x": x,
+                    "y": y,
+                    "width": w,
+                    "height": h,
+                    "confidence": round(float(score), 4),
+                }
+            )
 
     return {
         "status": "ok",
@@ -99,7 +104,12 @@ def handle_request(request: dict) -> dict:
 
     if req_type == "health":
         import paddleocr as _po
-        return {"status": "ok", "version": getattr(_po, "VERSION", "unknown"), "gpu": False}
+
+        return {
+            "status": "ok",
+            "version": getattr(_po, "VERSION", "unknown"),
+            "gpu": False,
+        }
     elif req_type == "ocr":
         image_path = request.get("image_path")
         if not image_path:
@@ -124,5 +134,5 @@ while True:
     except Exception as e:
         response = {"status": "error", "message": str(e)}
 
-    sys.stdout.write(json.dumps(response) + "\n")
+    sys.stdout.write(f"{json.dumps(response)}\n")
     sys.stdout.flush()
